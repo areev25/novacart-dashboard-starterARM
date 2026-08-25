@@ -130,46 +130,27 @@ def get_summary():
     - Total orders
     - Number of unique customers
     - Date range of available data
-
-    Expected response:
-    {
-        "total_revenue": 1284750.00,
-        "total_orders": 8432,
-        "unique_customers": 380,
-        "date_range": { "start": "2022-01-01", "end": "2022-12-31" }
-    }
-
-    TODO: implement this endpoint.
-    Hints:
-      - Use fact_orders table
-      - Filter status IN ('delivered', 'shipped') for revenue
-      - Use MIN/MAX of order_date for date_range
     """
     conn = get_connection()
 
-    # ── YOUR CODE HERE ────────────────────────────────────────────────────────
-    #
-    # results = execute_query(conn, """
-    #     SELECT
-    #         COUNT(DISTINCT order_id)    AS total_orders,
-    #         SUM(amount)                 AS total_revenue,
-    #         COUNT(DISTINCT customer_id) AS unique_customers,
-    #         MIN(order_date)             AS start_date,
-    #         MAX(order_date)             AS end_date
-    #     FROM fact_orders
-    #     WHERE status IN ('delivered', 'shipped')
-    # """)
-    #
-    # row = results[0]
-    # return {
-    #     "total_revenue":     round(row["total_revenue"] or 0, 2),
-    #     "total_orders":      row["total_orders"],
-    #     "unique_customers":  row["unique_customers"],
-    #     "date_range": {"start": row["start_date"], "end": row["end_date"]},
-    # }
-    # ─────────────────────────────────────────────────────────────────────────
+    results = execute_query(conn, """
+        SELECT
+            COUNT(DISTINCT order_id)    AS total_orders,
+            SUM(amount)                 AS total_revenue,
+            COUNT(DISTINCT customer_id) AS unique_customers,
+            MIN(order_date)             AS start_date,
+            MAX(order_date)             AS end_date
+        FROM fact_orders
+        WHERE status IN ('delivered', 'shipped')
+    """)
 
-    raise HTTPException(status_code=501, detail="Not implemented yet — your turn!")
+    row = results[0]
+    return {
+        "total_revenue":    round(row["total_revenue"] or 0, 2),
+        "total_orders":     row["total_orders"],
+        "unique_customers": row["unique_customers"],
+        "date_range": {"start": row["start_date"], "end": row["end_date"]},
+    }
 
 
 @app.get("/franchise/orders", tags=["Franchise"])
@@ -187,18 +168,33 @@ def get_orders(start: str = "2022-01-01", end: str = "2022-12-31"):
         { "month": "2022-01", "month_name": "January", "order_count": 842, "revenue": 128450.00 },
         { "month": "2022-02", "month_name": "February", "order_count": 910, "revenue": 141230.00 }
     ]
-
-    TODO: implement this endpoint.
-    Hints:
-      - JOIN fact_orders with dim_date on date_key
-      - GROUP BY year, month, month_name
-      - Filter order_date between start and end
-      - Only include delivered + shipped for revenue
     """
     conn = get_connection()
 
-    # ── YOUR CODE HERE ────────────────────────────────────────────────────────
-    raise HTTPException(status_code=501, detail="Not implemented yet — your turn!")
+    results = execute_query(conn, """
+        SELECT
+            d.year,
+            d.month,
+            d.month_name,
+            COUNT(DISTINCT o.order_id) AS order_count,
+            SUM(o.amount)              AS revenue
+        FROM fact_orders o
+        JOIN dim_date d ON o.date_key = d.date_key
+        WHERE o.status IN ('delivered', 'shipped')
+          AND o.order_date BETWEEN ? AND ?
+        GROUP BY d.year, d.month, d.month_name
+        ORDER BY d.year, d.month
+    """, (start, end))
+
+    return [
+        {
+            "month":       f"{r['year']}-{str(r['month']).zfill(2)}",
+            "month_name":  r["month_name"],
+            "order_count": r["order_count"],
+            "revenue":     round(r["revenue"] or 0, 2),
+        }
+        for r in results
+    ]
 
 
 @app.get("/franchise/products", tags=["Franchise"])
