@@ -85,15 +85,17 @@ export default function OrdersView() {
             <div className="stat-row">
               <div className="stat-box">
                 <div className="label">Total Revenue</div>
-                <div className="value">TODO</div>
+                <div className="value">
+                  $${Number(summary.total_revenue).toLocaleString()}
+                </div>
               </div>
               <div className="stat-box">
                 <div className="label">Total Orders</div>
-                <div className="value">TODO</div>
+                <div className="value">{summary.total_orders}</div>
               </div>
               <div className="stat-box">
                 <div className="label">Unique Customers</div>
-                <div className="value">TODO</div>
+                <div className="value">{summary.unique_customers}</div>
               </div>
             </div>
 
@@ -107,7 +109,15 @@ export default function OrdersView() {
               <div className="section-title" style={{ marginBottom: 16 }}>Monthly Revenue</div>
               {/* TODO: add your chart here */}
               <div className="loading" style={{ height: 200 }}>
-                Implement the monthly revenue chart using recharts BarChart
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={orders} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" /> 
+                    <XAxis dataKey="month_name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="revenue" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
@@ -120,9 +130,21 @@ export default function OrdersView() {
             */}
             <div className="card">
               <div className="section-title" style={{ marginBottom: 16 }}>Revenue by City</div>
-              {/* TODO: add your chart here */}
+              <ResponsiveContainer width="100%" height={400}>
+                </ResponsiveContainer>
               <div className="loading" style={{ height: 200 }}>
-                Implement the cities chart using recharts BarChart with layout="vertical"
+                "Create a chart whose dimensions are responsive to the parent contianer its inside of"
+                <ResponsiveContainer width="100%" height={400}>
+                  "Create a bar chart"
+                  <BarChart
+                  /*Pull data from the cities array, but only show the top 10 cities"*/
+                      data={cities.slice(0,10)}
+                  Layout="vertical"
+                  >
+
+                  </BarChart>
+                  </ResponsiveContainer>
+                  Implement the cities chart using recharts BarChart with layout="vertical"
               </div>
             </div>
           </>
