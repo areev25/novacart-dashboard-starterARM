@@ -335,3 +335,67 @@ def get_cities(start: str = "2022-01-01", end: str = "2022-12-31"):
     """, (start, end))
 
     return results
+
+
+@app.get("/franchise/customers/{customer_id}/orders", tags=["Customer Detail"])
+def get_customer_orders(customer_id: str, start: str = "2022-01-01", end: str = "2022-12-31"):
+    """
+    Returns the full order history for a specific customer.
+
+    Response:
+    [
+        { "order_id": "O001", "order_date": "2022-03-15", "product_name": "Wireless Headphones",
+          "category": "Electronics", "quantity": 2, "amount": 199.98, "status": "delivered" }
+    ]
+    """
+    conn = get_connection()
+
+    results = execute_query(conn, """
+        SELECT
+            fo.order_id,
+            fo.order_date,
+            dp.name                   AS product_name,
+            dp.category,
+            fo.quantity,
+            ROUND(fo.amount, 2)       AS amount,
+            fo.status
+        FROM fact_orders fo
+        JOIN dim_product dp ON fo.product_id = dp.product_id
+        WHERE fo.customer_id = ?
+          AND fo.order_date BETWEEN ? AND ?
+        ORDER BY fo.order_date DESC
+    """, (customer_id, start, end))
+
+    return results
+
+
+@app.get("/franchise/customers/{customer_id}/addresses", tags=["Customer Detail"])
+def get_customer_addresses(customer_id: str):
+    """
+    Returns the full address history for a specific customer (all SCD Type 2 records).
+
+    Response:
+    [
+        { "addr_street": "123 Main St", "addr_city": "Austin", "addr_state": "TX",
+          "addr_zip": "78701", "valid_from": "2020-01-01", "valid_to": "2021-06-30", "is_current": 0 },
+        { "addr_street": "456 Oak Ave", "addr_city": "Austin", "addr_state": "TX",
+          "addr_zip": "78702", "valid_from": "2021-07-01", "valid_to": null, "is_current": 1 }
+    ]
+    """
+    conn = get_connection()
+
+    results = execute_query(conn, """
+        SELECT
+            dc.addr_street,
+            dc.addr_city,
+            dc.addr_state,
+            dc.addr_zip,
+            dc.valid_from,
+            dc.valid_to,
+            dc.is_current
+        FROM dim_customer dc
+        WHERE dc.customer_id = ?
+        ORDER BY dc.valid_from ASC
+    """, (customer_id,))
+
+    return results

@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getCustomers, getCities } from '../utils/api';
 
@@ -20,6 +21,7 @@ function formatCurrency(value) {
 }
 
 export default function CustomersView() {
+  const navigate = useNavigate();
   const [startDate,  setStartDate]  = useState('2022-01-01');
   const [endDate,    setEndDate]    = useState('2022-12-31');
   const [city,       setCity]       = useState('');
@@ -143,7 +145,11 @@ export default function CustomersView() {
               <tbody>
                 {sorted.map((c, i) => (
                   <tr key={c.customer_id} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'transparent' : 'var(--bg-primary)' }}>
-                    <td style={{ padding: '10px 10px', color: 'var(--text-primary)' }}>{c.name}</td>
+                    <td style={{ padding: '10px 10px' }}>
+                      <span onClick={() => navigate(`/customers/${c.customer_id}`)} style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 500 }}>
+                        {c.name}
+                      </span>
+                    </td>
                     <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{c.city}</td>
                     <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{c.state}</td>
                     <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{c.total_orders}</td>
