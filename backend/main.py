@@ -226,13 +226,14 @@ def get_products(start: str = "2022-01-01", end: str = "2022-12-31"):
             dp.product_id,
             dp.name,
             dp.category,
+            dp.price                  AS price_per_unit,
             SUM(fo.quantity)          AS units_sold,
             ROUND(SUM(fo.amount), 2)  AS revenue
         FROM fact_orders fo
         JOIN dim_product dp ON fo.product_id = dp.product_id
         WHERE fo.status IN ('delivered', 'shipped')
           AND fo.order_date BETWEEN ? AND ?
-        GROUP BY dp.product_id, dp.name, dp.category
+        GROUP BY dp.product_id, dp.name, dp.category, dp.price
         ORDER BY revenue DESC
         LIMIT 10
     """, (start, end))

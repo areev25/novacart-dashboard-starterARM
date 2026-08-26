@@ -105,7 +105,7 @@ export default function ProductsView() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                 <thead>
                   <tr>
-                    {['Name', 'Category', 'Units Sold'].map(h => (
+                    {['Name', 'Category', 'Price/Unit', 'Units Sold'].map(h => (
                       <th key={h} style={{ textAlign: 'left', padding: '8px 10px', color: 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)' }}>
                         {h}
                       </th>
@@ -123,6 +123,7 @@ export default function ProductsView() {
                     <tr key={p.product_id} style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '10px 10px', color: 'var(--text-primary)' }}>{p.name}</td>
                       <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{p.category}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{formatCurrency(p.price_per_unit)}</td>
                       <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{p.units_sold.toLocaleString()}</td>
                       <td style={{ padding: '10px 10px', color: 'var(--text-primary)', fontWeight: 600 }}>{formatCurrency(p.revenue)}</td>
                     </tr>
