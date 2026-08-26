@@ -7,3 +7,6 @@ node_modules/
 build/
 *.log
 .DS_Store
+.bob/
+frontend/package-lock.json
+package-lock.json
