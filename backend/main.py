@@ -123,13 +123,17 @@ def authorize(request: Request):
 # ── Franchise endpoints ───────────────────────────────────────────────────────
 
 @app.get("/franchise/summary", tags=["Franchise"])
-def get_summary():
+def get_summary(start: str = "2022-01-01", end: str = "2022-12-31"):
     """
-    Returns an overview of all orders in the database:
+    Returns an overview of all orders in the database for the given date range:
     - Total revenue (delivered + shipped orders only)
     - Total orders
     - Number of unique customers
     - Date range of available data
+
+    Query parameters:
+      start: start date (YYYY-MM-DD)
+      end:   end date (YYYY-MM-DD)
     """
     conn = get_connection()
 
@@ -142,7 +146,8 @@ def get_summary():
             MAX(order_date)             AS end_date
         FROM fact_orders
         WHERE status IN ('delivered', 'shipped')
-    """)
+          AND order_date BETWEEN ? AND ?
+    """, (start, end))
 
     row = results[0]
     return {
