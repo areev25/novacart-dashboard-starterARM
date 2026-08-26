@@ -35,7 +35,7 @@ export default function OrdersView() {
     setError(null);
     try {
       const [s, o, c] = await Promise.all([
-        getSummary(),
+        getSummary(startDate, endDate),
         getOrders(startDate, endDate),
         getCities(startDate, endDate),
       ]);
@@ -86,7 +86,7 @@ export default function OrdersView() {
               <div className="stat-box">
                 <div className="label">Total Revenue</div>
                 <div className="value">
-                  $${Number(summary.total_revenue).toLocaleString()}
+                  ${Number(summary.total_revenue).toLocaleString()}
                 </div>
               </div>
               <div className="stat-box">
@@ -107,18 +107,15 @@ export default function OrdersView() {
             */}
             <div className="card" style={{ marginBottom: 20 }}>
               <div className="section-title" style={{ marginBottom: 16 }}>Monthly Revenue</div>
-              {/* TODO: add your chart here */}
-              <div className="loading" style={{ height: 200 }}>
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={orders} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" /> 
-                    <XAxis dataKey="month_name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="revenue" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={orders} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month_name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="revenue" fill="#00897B" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
             {/*
@@ -131,21 +128,14 @@ export default function OrdersView() {
             <div className="card">
               <div className="section-title" style={{ marginBottom: 16 }}>Revenue by City</div>
               <ResponsiveContainer width="100%" height={400}>
-                </ResponsiveContainer>
-              <div className="loading" style={{ height: 200 }}>
-                "Create a chart whose dimensions are responsive to the parent contianer its inside of"
-                <ResponsiveContainer width="100%" height={400}>
-                  "Create a bar chart"
-                  <BarChart
-                  /*Pull data from the cities array, but only show the top 10 cities"*/
-                      data={cities.slice(0,10)}
-                  Layout="vertical"
-                  >
-
-                  </BarChart>
-                  </ResponsiveContainer>
-                  Implement the cities chart using recharts BarChart with layout="vertical"
-              </div>
+                <BarChart data={cities.slice(0, 10)} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="city" />
+                  <Tooltip />
+                  <Bar dataKey="revenue" fill="#00897B" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </>
         )}
