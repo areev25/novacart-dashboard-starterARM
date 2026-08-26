@@ -252,42 +252,50 @@ def get_products(start: str = "2022-01-01", end: str = "2022-12-31", city: str =
 
 
 @app.get("/franchise/customers", tags=["Franchise"])
-def get_customers(start: str = "2022-01-01", end: str = "2022-12-31"):
+def get_customers(start: str = "2022-01-01", end: str = "2022-12-31", city: str = None):
     """
     Returns the top 20 customers by revenue for the given date range.
-
-    Expected response:
-    [
-        { "customer_id": "C001", "name": "Alice Johnson", "city": "Austin",
-          "state": "TX", "total_orders": 14, "total_spent": 1240.50 }
-    ]
-
-    TODO: implement this endpoint.
-    Hints:
-      - JOIN fact_orders with dim_customer on customer_id
-      - Only use dim_customer WHERE is_current = 1
-      - GROUP BY customer_id, name, addr_city, addr_state
-      - ORDER BY total_spent DESC, LIMIT 20
+    Optionally filter by city via the `city` query param.
     """
     conn = get_connection()
 
-    results = execute_query(conn, """
-        SELECT
-            dc.customer_id,
-            dc.name,
-            dc.addr_city              AS city,
-            dc.addr_state             AS state,
-            COUNT(fo.order_id)        AS total_orders,
-            ROUND(SUM(fo.amount), 2)  AS total_spent
-        FROM fact_orders fo
-        JOIN dim_customer dc ON fo.customer_id = dc.customer_id
-        WHERE dc.is_current = 1
-          AND fo.status IN ('delivered', 'shipped')
-          AND fo.order_date BETWEEN ? AND ?
-        GROUP BY dc.customer_id, dc.name, dc.addr_city, dc.addr_state
-        ORDER BY total_spent DESC
-        LIMIT 20
-    """, (start, end))
+    if city:
+        results = execute_query(conn, """
+            SELECT
+                dc.customer_id,
+                dc.name,
+                dc.addr_city              AS city,
+                dc.addr_state             AS state,
+                COUNT(fo.order_id)        AS total_orders,
+                ROUND(SUM(fo.amount), 2)  AS total_spent
+            FROM fact_orders fo
+            JOIN dim_customer dc ON fo.customer_id = dc.customer_id
+            WHERE dc.is_current = 1
+              AND fo.status IN ('delivered', 'shipped')
+              AND fo.order_date BETWEEN ? AND ?
+              AND dc.addr_city = ?
+            GROUP BY dc.customer_id, dc.name, dc.addr_city, dc.addr_state
+            ORDER BY total_spent DESC
+            LIMIT 20
+        """, (start, end, city))
+    else:
+        results = execute_query(conn, """
+            SELECT
+                dc.customer_id,
+                dc.name,
+                dc.addr_city              AS city,
+                dc.addr_state             AS state,
+                COUNT(fo.order_id)        AS total_orders,
+                ROUND(SUM(fo.amount), 2)  AS total_spent
+            FROM fact_orders fo
+            JOIN dim_customer dc ON fo.customer_id = dc.customer_id
+            WHERE dc.is_current = 1
+              AND fo.status IN ('delivered', 'shipped')
+              AND fo.order_date BETWEEN ? AND ?
+            GROUP BY dc.customer_id, dc.name, dc.addr_city, dc.addr_state
+            ORDER BY total_spent DESC
+            LIMIT 20
+        """, (start, end))
 
     return results
 

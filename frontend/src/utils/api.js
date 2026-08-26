@@ -23,5 +23,5 @@ export async function getHealth()       { return apiFetch('/health'); }
 export async function getSummary(s, e)  { return apiFetch(`/franchise/summary?start=${s}&end=${e}`); }
 export async function getOrders(s, e)   { return apiFetch(`/franchise/orders?start=${s}&end=${e}`); }
 export async function getProducts(s, e, city = '') { return apiFetch(`/franchise/products?start=${s}&end=${e}${city ? `&city=${encodeURIComponent(city)}` : ''}`); }
-export async function getCustomers(s,e) { return apiFetch(`/franchise/customers?start=${s}&end=${e}`); }
+export async function getCustomers(s, e, city = '') { return apiFetch(`/franchise/customers?start=${s}&end=${e}${city ? `&city=${encodeURIComponent(city)}` : ''}`); }
 export async function getCities(s, e)   { return apiFetch(`/franchise/cities?start=${s}&end=${e}`); }
