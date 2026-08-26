@@ -56,22 +56,22 @@ export default function OrdersView() {
 
         {/* ── Filter bar ─────────────────────────────────────────────────── */}
         <div className="filter-bar">
-          <label>From</label>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-          <label>To</label>
-          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+          <label htmlFor="orders-start-date">From</label>
+          <input id="orders-start-date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <label htmlFor="orders-end-date">To</label>
+          <input id="orders-end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
         </div>
 
         {/* ── Error state ────────────────────────────────────────────────── */}
         {error && (
-          <div style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
+          <div role="alert" style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
             Error: {error}
           </div>
         )}
 
         {/* ── Loading state ──────────────────────────────────────────────── */}
-        {loading && <div className="loading">Loading orders data…</div>}
+        {loading && <div role="status" className="loading">Loading orders data…</div>}
 
         {/* ── TODO: Build the UI here ────────────────────────────────────── */}
         {!loading && !error && (
@@ -112,8 +112,8 @@ export default function OrdersView() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month_name" />
                   <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="revenue" fill="#00897B" />
+                  <Tooltip labelStyle={{ color: '#1A2332' }} />
+                  <Bar dataKey="revenue" fill="var(--chart-color)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -132,8 +132,8 @@ export default function OrdersView() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
                   <YAxis type="category" dataKey="city" />
-                  <Tooltip />
-                  <Bar dataKey="revenue" fill="#00897B" />
+                  <Tooltip labelStyle={{ color: '#1A2332' }} />
+                  <Bar dataKey="revenue" fill="var(--chart-color)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
