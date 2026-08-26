@@ -18,6 +18,7 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import Navbar from '../components/Navbar';
 import { getSummary, getOrders, getCities } from '../utils/api';
+import { exportToExcel } from '../utils/exportToExcel';
 
 export default function OrdersView() {
   const [startDate, setStartDate] = useState('2022-01-01');
@@ -61,6 +62,13 @@ export default function OrdersView() {
           <label>To</label>
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
+          <button className="btn-apply" style={{ marginLeft: 'auto', background: 'var(--blue)' }}
+            onClick={() => exportToExcel(`orders_${startDate}_${endDate}`, [
+              { sheetName: 'Monthly Revenue', rows: orders },
+              { sheetName: 'Revenue by City', rows: cities },
+            ])}>
+            Export Excel
+          </button>
         </div>
 
         {/* ── Error state ────────────────────────────────────────────────── */}

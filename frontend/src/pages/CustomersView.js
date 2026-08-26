@@ -14,6 +14,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getCustomers, getCities } from '../utils/api';
+import { exportToExcel } from '../utils/exportToExcel';
 
 function formatCurrency(value) {
   if (!value) return '$0';
@@ -92,6 +93,12 @@ export default function CustomersView() {
             ))}
           </select>
           <button className="btn-apply" onClick={loadData}>Apply</button>
+          <button className="btn-apply" style={{ background: 'var(--blue)' }}
+            onClick={() => exportToExcel(`customers_${startDate}_${endDate}${city ? `_${city}` : ''}`, [
+              { sheetName: 'Customers', rows: sorted },
+            ])}>
+            Export Excel
+          </button>
           <span style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--text-muted)' }}>
             {customers.length} customers
           </span>
