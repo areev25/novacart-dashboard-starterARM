@@ -62,7 +62,9 @@ export default function OrdersView() {
           <label htmlFor="orders-end-date">To</label>
           <input id="orders-end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
-          <button className="btn-apply" style={{ marginLeft: 'auto', background: 'var(--blue)' }}
+          <button className="btn-apply"
+            aria-label="Export orders data to Excel"
+            style={{ marginLeft: 'auto', background: 'var(--blue)' }}
             onClick={() => exportToExcel(`orders_${startDate}_${endDate}`, [
               { sheetName: 'Monthly Revenue', rows: orders },
               { sheetName: 'Revenue by City', rows: cities },

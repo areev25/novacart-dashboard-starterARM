@@ -71,7 +71,9 @@ export default function ProductsView() {
             ))}
           </select>
           <button className="btn-apply" onClick={loadData}>Apply</button>
-          <button className="btn-apply" style={{ marginLeft: 'auto', background: 'var(--blue)' }}
+          <button className="btn-apply"
+            aria-label="Export products data to Excel"
+            style={{ marginLeft: 'auto', background: 'var(--blue)' }}
             onClick={() => exportToExcel(`products_${startDate}_${endDate}${city ? `_${city}` : ''}`, [
               { sheetName: 'Products', rows: products },
             ])}>

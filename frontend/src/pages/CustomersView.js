@@ -93,7 +93,9 @@ export default function CustomersView() {
             ))}
           </select>
           <button className="btn-apply" onClick={loadData}>Apply</button>
-          <button className="btn-apply" style={{ background: 'var(--blue)' }}
+          <button className="btn-apply"
+            aria-label="Export customers data to Excel"
+            style={{ background: 'var(--blue)' }}
             onClick={() => exportToExcel(`customers_${startDate}_${endDate}${city ? `_${city}` : ''}`, [
               { sheetName: 'Customers', rows: sorted },
             ])}>
@@ -143,7 +145,11 @@ export default function CustomersView() {
                     { label: 'Orders',      key: 'total_orders' },
                     { label: 'Total Spent', key: 'total_spent'  },
                   ].map(({ label, key }) => (
-                    <th key={key} onClick={() => handleSort(key)} style={{ textAlign: 'left', padding: '8px 10px', color: sortBy === key ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)', cursor: 'pointer', userSelect: 'none' }}>
+                    <th key={key}
+                      tabIndex={0}
+                      onClick={() => handleSort(key)}
+                      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleSort(key)}
+                      style={{ textAlign: 'left', padding: '8px 10px', color: sortBy === key ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)', cursor: 'pointer', userSelect: 'none' }}>
                       {label}{sortIcon(key)}
                     </th>
                   ))}
