@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Navbar from '../components/Navbar';
 import { getProducts } from '../utils/api';
 
@@ -27,8 +27,13 @@ export default function ProductsView() {
   const [startDate, setStartDate] = useState('2022-01-01');
   const [endDate,   setEndDate]   = useState('2022-12-31');
   const [products,  setProducts]  = useState([]);
+  const [sortDir,   setSortDir]   = useState('desc');
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
+
+  const sorted = [...products].sort((a, b) =>
+    sortDir === 'desc' ? b.revenue - a.revenue : a.revenue - b.revenue
+  );
 
   useEffect(() => { loadData(); }, []);
 
@@ -78,10 +83,15 @@ export default function ProductsView() {
             */}
             <div className="card">
               <div className="section-title" style={{ marginBottom: 16 }}>Top 10 Products by Revenue</div>
-              {/* TODO: add your bar chart here */}
-              <div className="loading" style={{ height: 300 }}>
-                Implement the products bar chart
-              </div>
+              <ResponsiveContainer width="100%" height={420}>
+                <BarChart data={products} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" width={160} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar dataKey="revenue" fill="#00897B" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
             {/*
@@ -92,10 +102,33 @@ export default function ProductsView() {
             */}
             <div className="card">
               <div className="section-title" style={{ marginBottom: 16 }}>Product Details</div>
-              {/* TODO: add your table here */}
-              <div className="loading" style={{ height: 300 }}>
-                Implement the products table
-              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr>
+                    {['Name', 'Category', 'Units Sold'].map(h => (
+                      <th key={h} style={{ textAlign: 'left', padding: '8px 10px', color: 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)' }}>
+                        {h}
+                      </th>
+                    ))}
+                    <th
+                      onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')}
+                      style={{ textAlign: 'left', padding: '8px 10px', color: 'var(--accent)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)', cursor: 'pointer', userSelect: 'none' }}
+                    >
+                      Revenue {sortDir === 'desc' ? '↓' : '↑'}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map(p => (
+                    <tr key={p.product_id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-primary)' }}>{p.name}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{p.category}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{p.units_sold.toLocaleString()}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-primary)', fontWeight: 600 }}>{formatCurrency(p.revenue)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
           </div>
