@@ -12,7 +12,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { getCustomers } from '../utils/api';
+import { getCustomers, getCities } from '../utils/api';
 
 function formatCurrency(value) {
   if (!value) return '$0';
@@ -22,19 +22,24 @@ function formatCurrency(value) {
 export default function CustomersView() {
   const [startDate,  setStartDate]  = useState('2022-01-01');
   const [endDate,    setEndDate]    = useState('2022-12-31');
+  const [city,       setCity]       = useState('');
+  const [cities,     setCities]     = useState([]);
   const [customers,  setCustomers]  = useState([]);
   const [sortBy,     setSortBy]     = useState('total_spent');
   const [sortDir,    setSortDir]    = useState('desc');
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState(null);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    getCities(startDate, endDate).then(setCities).catch(() => {});
+    loadData();
+  }, []);
 
   async function loadData() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getCustomers(startDate, endDate);
+      const data = await getCustomers(startDate, endDate, city);
       setCustomers(data);
     } catch (err) {
       setError(err.message);
@@ -76,6 +81,15 @@ export default function CustomersView() {
           <label>To</label>
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
+          <div style={{ width: 1, height: 28, background: 'var(--border)', margin: '0 8px' }} />
+          <label>City</label>
+          <select value={city} onChange={e => setCity(e.target.value)} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', color: 'var(--text-primary)', fontSize: 13 }}>
+            <option value="">All Cities</option>
+            {cities.map(c => (
+              <option key={c.city} value={c.city}>{c.city}, {c.state}</option>
+            ))}
+          </select>
+          <button className="btn-apply" onClick={loadData}>Apply</button>
           <span style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--text-muted)' }}>
             {customers.length} customers
           </span>
@@ -110,13 +124,34 @@ export default function CustomersView() {
               Format total_spent with formatCurrency().
             */}
 
-            {/* TODO: add your sortable table here */}
-            <div className="loading" style={{ height: 400 }}>
-              Implement the sortable customers table.
-              Data available in: sorted (array of customer objects)
-              Sorting state: sortBy="{sortBy}", sortDir="{sortDir}"
-              Use handleSort(column) to handle header clicks.
-            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr>
+                  {[
+                    { label: 'Name',        key: 'name'         },
+                    { label: 'City',        key: 'city'         },
+                    { label: 'State',       key: 'state'        },
+                    { label: 'Orders',      key: 'total_orders' },
+                    { label: 'Total Spent', key: 'total_spent'  },
+                  ].map(({ label, key }) => (
+                    <th key={key} onClick={() => handleSort(key)} style={{ textAlign: 'left', padding: '8px 10px', color: sortBy === key ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)', cursor: 'pointer', userSelect: 'none' }}>
+                      {label}{sortIcon(key)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((c, i) => (
+                  <tr key={c.customer_id} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'transparent' : 'var(--bg-primary)' }}>
+                    <td style={{ padding: '10px 10px', color: 'var(--text-primary)' }}>{c.name}</td>
+                    <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{c.city}</td>
+                    <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{c.state}</td>
+                    <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{c.total_orders}</td>
+                    <td style={{ padding: '10px 10px', color: 'var(--text-primary)', fontWeight: 600 }}>{formatCurrency(c.total_spent)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
           </div>
         )}

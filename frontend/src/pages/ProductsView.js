@@ -11,9 +11,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Navbar from '../components/Navbar';
-import { getProducts } from '../utils/api';
+import { getProducts, getCities } from '../utils/api';
 
 // Format currency helper
 function formatCurrency(value) {
@@ -26,17 +26,22 @@ function formatCurrency(value) {
 export default function ProductsView() {
   const [startDate, setStartDate] = useState('2022-01-01');
   const [endDate,   setEndDate]   = useState('2022-12-31');
+  const [city,      setCity]      = useState('');
+  const [cities,    setCities]    = useState([]);
   const [products,  setProducts]  = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    getCities(startDate, endDate).then(setCities).catch(() => {});
+    loadData();
+  }, []);
 
   async function loadData() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getProducts(startDate, endDate);
+      const data = await getProducts(startDate, endDate, city);
       setProducts(data);
     } catch (err) {
       setError(err.message);
@@ -55,6 +60,15 @@ export default function ProductsView() {
           <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
           <label>To</label>
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+          <button className="btn-apply" onClick={loadData}>Apply</button>
+          <div style={{ width: 1, height: 28, background: 'var(--border)', margin: '0 8px' }} />
+          <label>City</label>
+          <select value={city} onChange={e => setCity(e.target.value)} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', color: 'var(--text-primary)', fontSize: 13 }}>
+            <option value="">All Cities</option>
+            {cities.map(c => (
+              <option key={c.city} value={c.city}>{c.city}, {c.state}</option>
+            ))}
+          </select>
           <button className="btn-apply" onClick={loadData}>Apply</button>
         </div>
 
@@ -78,10 +92,15 @@ export default function ProductsView() {
             */}
             <div className="card">
               <div className="section-title" style={{ marginBottom: 16 }}>Top 10 Products by Revenue</div>
-              {/* TODO: add your bar chart here */}
-              <div className="loading" style={{ height: 300 }}>
-                Implement the products bar chart
-              </div>
+              <ResponsiveContainer width="100%" height={420}>
+                <BarChart data={products} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" width={160} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar dataKey="revenue" fill="#00897B" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
             {/*
@@ -92,10 +111,28 @@ export default function ProductsView() {
             */}
             <div className="card">
               <div className="section-title" style={{ marginBottom: 16 }}>Product Details</div>
-              {/* TODO: add your table here */}
-              <div className="loading" style={{ height: 300 }}>
-                Implement the products table
-              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr>
+                    {['Name', 'Category', 'Price/Unit', 'Units Sold', 'Revenue'].map(h => (
+                      <th key={h} style={{ textAlign: 'left', padding: '8px 10px', color: 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '2px solid var(--border)' }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(p => (
+                    <tr key={p.product_id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-primary)' }}>{p.name}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{p.category}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{formatCurrency(p.price_per_unit)}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-secondary)' }}>{p.units_sold.toLocaleString()}</td>
+                      <td style={{ padding: '10px 10px', color: 'var(--text-primary)', fontWeight: 600 }}>{formatCurrency(p.revenue)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
           </div>
