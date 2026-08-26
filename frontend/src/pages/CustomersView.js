@@ -79,14 +79,14 @@ export default function CustomersView() {
       <div className="page">
 
         <div className="filter-bar">
-          <label>From</label>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-          <label>To</label>
-          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+          <label htmlFor="customers-start-date">From</label>
+          <input id="customers-start-date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <label htmlFor="customers-end-date">To</label>
+          <input id="customers-end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
           <div style={{ width: 1, height: 28, background: 'var(--border)', margin: '0 8px' }} />
-          <label>City</label>
-          <select value={city} onChange={e => setCity(e.target.value)} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', color: 'var(--text-primary)', fontSize: 13 }}>
+          <label htmlFor="customers-city">City</label>
+          <select id="customers-city" value={city} onChange={e => setCity(e.target.value)} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', color: 'var(--text-primary)', fontSize: 13 }}>
             <option value="">All Cities</option>
             {cities.map(c => (
               <option key={c.city} value={c.city}>{c.city}, {c.state}</option>
@@ -105,12 +105,12 @@ export default function CustomersView() {
         </div>
 
         {error && (
-          <div style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
+          <div role="alert" style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
             Error: {error}
           </div>
         )}
 
-        {loading && <div className="loading">Loading customers…</div>}
+        {loading && <div role="status" className="loading">Loading customers…</div>}
 
         {!loading && !error && (
           <div className="card">
@@ -153,7 +153,11 @@ export default function CustomersView() {
                 {sorted.map((c, i) => (
                   <tr key={c.customer_id} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'transparent' : 'var(--bg-primary)' }}>
                     <td style={{ padding: '10px 10px' }}>
-                      <span onClick={() => navigate(`/customers/${c.customer_id}`)} style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 500 }}>
+                      <span
+                        tabIndex={0}
+                        onClick={() => navigate(`/customers/${c.customer_id}`)}
+                        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate(`/customers/${c.customer_id}`)}
+                        style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 500 }}>
                         {c.name}
                       </span>
                     </td>

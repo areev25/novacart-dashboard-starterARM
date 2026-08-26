@@ -3,10 +3,11 @@
   --bg-card:      #FFFFFF;
   --text-primary: #1A2332;
   --text-secondary:#455A64;
-  --text-muted:   #90A4AE;
+  --text-muted:   #546E7A;
   --border:       #E0E6ED;
   --accent:       #00897B;
   --blue:         #1565C0;
+  --chart-color:  #1565C0;
   --shadow:       0 2px 12px rgba(0,0,0,0.08);
   --radius:       10px;
 }
@@ -20,6 +21,7 @@
   --border:       #1E3248;
   --accent:       #4DB6AC;
   --blue:         #42A5F5;
+  --chart-color:  #42A5F5;
   --shadow:       0 2px 12px rgba(0,0,0,0.3);
 }
 
@@ -83,3 +85,8 @@ body {
 .btn-apply:hover { opacity: 0.85; }
 
 .loading { display: flex; align-items: center; justify-content: center; height: 200px; color: var(--text-muted); font-size: 14px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

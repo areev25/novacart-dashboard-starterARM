@@ -74,20 +74,20 @@ export default function CustomerDetailView() {
 
         {/* ── Date filter ── */}
         <div className="filter-bar">
-          <label>From</label>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-          <label>To</label>
-          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+          <label htmlFor="detail-start-date">From</label>
+          <input id="detail-start-date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <label htmlFor="detail-end-date">To</label>
+          <input id="detail-end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
         </div>
 
         {error && (
-          <div style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
+          <div role="alert" style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
             Error: {error}
           </div>
         )}
 
-        {loading && <div className="loading">Loading customer data…</div>}
+        {loading && <div role="status" className="loading">Loading customer data…</div>}
 
         {!loading && !error && (
           <>

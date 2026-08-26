@@ -34,10 +34,11 @@ export default function Navbar() {
           const active = location.pathname === path;
           return (
             <button key={path} onClick={() => navigate(path)}
+              aria-current={active ? 'page' : undefined}
               style={{
                 background: active ? 'rgba(77,182,172,0.2)' : 'transparent',
                 border: active ? '1px solid #4DB6AC' : '1px solid transparent',
-                color: active ? '#4DB6AC' : '#B0BEC5',
+                color: active ? '#4DB6AC' : '#CFD8DC',
                 borderRadius: 6, padding: '4px 14px', cursor: 'pointer', fontSize: 13, fontWeight: 500,
               }}>
               {label}

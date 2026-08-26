@@ -57,14 +57,14 @@ export default function ProductsView() {
       <div className="page">
 
         <div className="filter-bar">
-          <label>From</label>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-          <label>To</label>
-          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+          <label htmlFor="products-start-date">From</label>
+          <input id="products-start-date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <label htmlFor="products-end-date">To</label>
+          <input id="products-end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
           <button className="btn-apply" onClick={loadData}>Apply</button>
           <div style={{ width: 1, height: 28, background: 'var(--border)', margin: '0 8px' }} />
-          <label>City</label>
-          <select value={city} onChange={e => setCity(e.target.value)} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', color: 'var(--text-primary)', fontSize: 13 }}>
+          <label htmlFor="products-city">City</label>
+          <select id="products-city" value={city} onChange={e => setCity(e.target.value)} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px', color: 'var(--text-primary)', fontSize: 13 }}>
             <option value="">All Cities</option>
             {cities.map(c => (
               <option key={c.city} value={c.city}>{c.city}, {c.state}</option>
@@ -80,12 +80,12 @@ export default function ProductsView() {
         </div>
 
         {error && (
-          <div style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
+          <div role="alert" style={{ color: '#C62828', padding: 16, background: '#FFEBEE', borderRadius: 8, marginBottom: 16 }}>
             Error: {error}
           </div>
         )}
 
-        {loading && <div className="loading">Loading products data…</div>}
+        {loading && <div role="status" className="loading">Loading products data…</div>}
 
         {!loading && !error && (
           <div className="grid-2">
@@ -104,8 +104,8 @@ export default function ProductsView() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" width={160} tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Bar dataKey="revenue" fill="#00897B" />
+                  <Tooltip labelStyle={{ color: '#1A2332' }} />
+                  <Bar dataKey="revenue" fill="var(--chart-color)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
