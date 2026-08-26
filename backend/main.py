@@ -203,40 +203,50 @@ def get_orders(start: str = "2022-01-01", end: str = "2022-12-31"):
 
 
 @app.get("/franchise/products", tags=["Franchise"])
-def get_products(start: str = "2022-01-01", end: str = "2022-12-31"):
+def get_products(start: str = "2022-01-01", end: str = "2022-12-31", city: str = None):
     """
     Returns the top 10 products by revenue for the given date range.
-
-    Expected response:
-    [
-        { "product_id": "P001", "name": "Wireless Headphones", "category": "Electronics",
-          "units_sold": 342, "revenue": 30578.58 }
-    ]
-
-    TODO: implement this endpoint.
-    Hints:
-      - JOIN fact_orders with dim_product on product_id
-      - GROUP BY product_id, name, category
-      - ORDER BY revenue DESC, LIMIT 10
+    Optionally filter by city via the `city` query param.
     """
     conn = get_connection()
 
-    results = execute_query(conn, """
-        SELECT
-            dp.product_id,
-            dp.name,
-            dp.category,
-            dp.price                  AS price_per_unit,
-            SUM(fo.quantity)          AS units_sold,
-            ROUND(SUM(fo.amount), 2)  AS revenue
-        FROM fact_orders fo
-        JOIN dim_product dp ON fo.product_id = dp.product_id
-        WHERE fo.status IN ('delivered', 'shipped')
-          AND fo.order_date BETWEEN ? AND ?
-        GROUP BY dp.product_id, dp.name, dp.category, dp.price
-        ORDER BY revenue DESC
-        LIMIT 10
-    """, (start, end))
+    if city:
+        results = execute_query(conn, """
+            SELECT
+                dp.product_id,
+                dp.name,
+                dp.category,
+                dp.price                  AS price_per_unit,
+                SUM(fo.quantity)          AS units_sold,
+                ROUND(SUM(fo.amount), 2)  AS revenue
+            FROM fact_orders fo
+            JOIN dim_product dp ON fo.product_id = dp.product_id
+            JOIN dim_customer dc ON fo.customer_id = dc.customer_id
+            WHERE fo.status IN ('delivered', 'shipped')
+              AND fo.order_date BETWEEN ? AND ?
+              AND dc.is_current = 1
+              AND dc.addr_city = ?
+            GROUP BY dp.product_id, dp.name, dp.category, dp.price
+            ORDER BY revenue DESC
+            LIMIT 10
+        """, (start, end, city))
+    else:
+        results = execute_query(conn, """
+            SELECT
+                dp.product_id,
+                dp.name,
+                dp.category,
+                dp.price                  AS price_per_unit,
+                SUM(fo.quantity)          AS units_sold,
+                ROUND(SUM(fo.amount), 2)  AS revenue
+            FROM fact_orders fo
+            JOIN dim_product dp ON fo.product_id = dp.product_id
+            WHERE fo.status IN ('delivered', 'shipped')
+              AND fo.order_date BETWEEN ? AND ?
+            GROUP BY dp.product_id, dp.name, dp.category, dp.price
+            ORDER BY revenue DESC
+            LIMIT 10
+        """, (start, end))
 
     return results
 
