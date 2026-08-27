@@ -37,6 +37,11 @@ export default function CustomerDetailView() {
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
+    if (startDate > endDate) {
+      setError("Start date cannot be chronologically after the end date.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -55,6 +60,7 @@ export default function CustomerDetailView() {
 
   const currentAddress = addresses.find(a => a.is_current);
   const totalSpent = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
+  const customerExists = addresses.length > 0;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
@@ -89,7 +95,15 @@ export default function CustomerDetailView() {
 
         {loading && <div className="loading">Loading customer data…</div>}
 
-        {!loading && !error && (
+        {!loading && !error && !customerExists && (
+          <div className="card" style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-secondary)' }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>👤</div>
+            <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>Customer Not Found</div>
+            <div>The customer ID <strong>{customer_id}</strong> does not exist in the database. Please verify the ID or navigate back to the customer list.</div>
+          </div>
+        )}
+
+        {!loading && !error && customerExists && (
           <>
             {/* ── Stat row ── */}
             <div className="stat-row">

@@ -31,6 +31,11 @@ export default function OrdersView() {
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
+    if (startDate > endDate) {
+      setError("Start date cannot be chronologically after the end date.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
