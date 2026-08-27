@@ -146,7 +146,7 @@ def get_summary(start: str = "2022-01-01", end: str = "2022-12-31"):
             MAX(order_date)             AS end_date
         FROM fact_orders
         WHERE status IN ('delivered', 'shipped')
-          AND order_date BETWEEN ? AND ?
+          AND order_date BETWEEN %s AND %s
     """, (start, end))
 
     row = results[0]
@@ -186,7 +186,7 @@ def get_orders(start: str = "2022-01-01", end: str = "2022-12-31"):
         FROM fact_orders o
         JOIN dim_date d ON o.date_key = d.date_key
         WHERE o.status IN ('delivered', 'shipped')
-          AND o.order_date BETWEEN ? AND ?
+          AND o.order_date BETWEEN %s AND %s
         GROUP BY d.year, d.month, d.month_name
         ORDER BY d.year, d.month
     """, (start, end))
@@ -223,9 +223,9 @@ def get_products(start: str = "2022-01-01", end: str = "2022-12-31", city: str =
             JOIN dim_product dp ON fo.product_id = dp.product_id
             JOIN dim_customer dc ON fo.customer_id = dc.customer_id
             WHERE fo.status IN ('delivered', 'shipped')
-              AND fo.order_date BETWEEN ? AND ?
+              AND fo.order_date BETWEEN %s AND %s
               AND dc.is_current = 1
-              AND dc.addr_city = ?
+              AND dc.addr_city = %s
             GROUP BY dp.product_id, dp.name, dp.category, dp.price
             ORDER BY revenue DESC
             LIMIT 10
@@ -242,7 +242,7 @@ def get_products(start: str = "2022-01-01", end: str = "2022-12-31", city: str =
             FROM fact_orders fo
             JOIN dim_product dp ON fo.product_id = dp.product_id
             WHERE fo.status IN ('delivered', 'shipped')
-              AND fo.order_date BETWEEN ? AND ?
+              AND fo.order_date BETWEEN %s AND %s
             GROUP BY dp.product_id, dp.name, dp.category, dp.price
             ORDER BY revenue DESC
             LIMIT 10
@@ -272,8 +272,8 @@ def get_customers(start: str = "2022-01-01", end: str = "2022-12-31", city: str 
             JOIN dim_customer dc ON fo.customer_id = dc.customer_id
             WHERE dc.is_current = 1
               AND fo.status IN ('delivered', 'shipped')
-              AND fo.order_date BETWEEN ? AND ?
-              AND dc.addr_city = ?
+              AND fo.order_date BETWEEN %s AND %s
+              AND dc.addr_city = %s
             GROUP BY dc.customer_id, dc.name, dc.addr_city, dc.addr_state
             ORDER BY total_spent DESC
             LIMIT 20
@@ -291,7 +291,7 @@ def get_customers(start: str = "2022-01-01", end: str = "2022-12-31", city: str 
             JOIN dim_customer dc ON fo.customer_id = dc.customer_id
             WHERE dc.is_current = 1
               AND fo.status IN ('delivered', 'shipped')
-              AND fo.order_date BETWEEN ? AND ?
+              AND fo.order_date BETWEEN %s AND %s
             GROUP BY dc.customer_id, dc.name, dc.addr_city, dc.addr_state
             ORDER BY total_spent DESC
             LIMIT 20
@@ -329,7 +329,7 @@ def get_cities(start: str = "2022-01-01", end: str = "2022-12-31"):
         JOIN dim_customer dc ON fo.customer_id = dc.customer_id
         WHERE dc.is_current = 1
           AND fo.status IN ('delivered', 'shipped')
-          AND fo.order_date BETWEEN ? AND ?
+          AND fo.order_date BETWEEN %s AND %s
         GROUP BY dc.addr_city, dc.addr_state
         ORDER BY revenue DESC
     """, (start, end))
@@ -361,8 +361,8 @@ def get_customer_orders(customer_id: str, start: str = "2022-01-01", end: str = 
             fo.status
         FROM fact_orders fo
         JOIN dim_product dp ON fo.product_id = dp.product_id
-        WHERE fo.customer_id = ?
-          AND fo.order_date BETWEEN ? AND ?
+        WHERE fo.customer_id = %s
+          AND fo.order_date BETWEEN %s AND %s
         ORDER BY fo.order_date DESC
     """, (customer_id, start, end))
 
@@ -394,7 +394,7 @@ def get_customer_addresses(customer_id: str):
             dc.valid_to,
             dc.is_current
         FROM dim_customer dc
-        WHERE dc.customer_id = ?
+        WHERE dc.customer_id = %s
         ORDER BY dc.valid_from ASC
     """, (customer_id,))
 
